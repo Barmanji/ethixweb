@@ -1,5 +1,9 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+.agents
+.agent
+.claude
+
 # dependencies
 /node_modules
 /.pnp
@@ -39,3 +43,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+instruction_rules.md
+
+
+/lib/generated/prisma

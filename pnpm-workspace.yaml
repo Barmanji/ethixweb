@@ -1,0 +1,11 @@
+allowBuilds:
+  '@prisma/engines': true
+  prisma: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - framer-motion@14.2.0
+  - lucide-react@1.56.0
+  - motion-dom@14.2.0
+  - motion-utils@14.1.1
+  - motion@14.2.0
+  - react-resizable-panels@4.14.5

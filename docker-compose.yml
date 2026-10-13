@@ -1,0 +1,16 @@
+services:
+  ethixweb-postgres:
+    image: postgres:17
+    container_name: ethixweb_db
+    environment:
+      POSTGRES_DB: ethixweb_be
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ethixweb_pg_data:/var/lib/postgresql/data
+
+volumes:
+  ethixweb_pg_data:
+
