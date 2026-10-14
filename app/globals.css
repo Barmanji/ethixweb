@@ -256,6 +256,22 @@ blockquote em {
   transform: scaleX(1);
   transform-origin: left;
 }
+.nav-links a.nav-admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--rose);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.nav-links a.nav-admin-link::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--rose);
+  content: "";
+}
 .nav-actions {
   display: flex;
   align-items: center;
@@ -2873,6 +2889,12 @@ html[data-theme="light"] .nav-links a {
 html[data-theme="light"] .nav-links a:hover,
 html[data-theme="light"] .nav-links a[aria-current="page"] {
   color: #1f756b;
+}
+html[data-theme="light"] .nav-links a.nav-admin-link {
+  color: #1f756b;
+}
+html[data-theme="light"] .nav-links a.nav-admin-link::before {
+  background: #1f756b;
 }
 html[data-theme="light"] .nav-location,
 html[data-theme="light"] .hero-meta,

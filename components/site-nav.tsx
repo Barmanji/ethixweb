@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ThemeToggle from "@/components/theme-toggle";
 import IndiaClock from "@/components/india-clock";
+import AdminNavLink from "@/components/admin-nav-link";
 
 const links = [
   { href: "/", label: "Home" },
@@ -69,6 +70,9 @@ export default function SiteNav() {
               {label}
             </Link>
           ))}
+          {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
+            <AdminNavLink onNavigate={() => setOpen(false)} />
+          ) : null}
           <Link
             className="mobile-nav-cta"
             href="/contact"

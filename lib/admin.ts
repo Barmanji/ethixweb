@@ -7,6 +7,13 @@ export type AdminAccess =
   | { status: "unauthorized"; email: string | null }
   | { status: "authorized"; userId: string; email: string };
 
+function clerkConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+      process.env.CLERK_SECRET_KEY,
+  );
+}
+
 function isAllowlisted(email: string | null): email is string {
   if (!email) return false;
   const allowlist = (process.env.ADMIN_EMAILS ?? "")
@@ -20,11 +27,7 @@ function isAllowlisted(email: string | null): email is string {
 // access to a signed-in visitor instead of returning a blank 404; mutations
 // keep using requireAdmin so they stay strict.
 export async function getAdminAccess(): Promise<AdminAccess> {
-  if (
-    !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
-    !process.env.CLERK_SECRET_KEY
-  )
-    return { status: "unconfigured" };
+  if (!clerkConfigured()) return { status: "unconfigured" };
 
   // Redirects to sign-in when there is no session.
   const { userId } = await auth.protect();
@@ -38,4 +41,23 @@ export async function requireAdmin() {
   const access = await getAdminAccess();
   if (access.status !== "authorized") notFound();
   return { userId: access.userId, email: access.email };
+}
+
+// Non-redirecting check used for UI hints such as the nav shortcut. It reads
+// the same ADMIN_EMAILS allowlist but only ever answers whether the *current*
+// session belongs to an admin, so the list itself stays on the server. Fails
+// closed when Clerk is unconfigured, there is no session, or the request
+// bypassed clerkMiddleware.
+export async function isCurrentUserAdmin(): Promise<boolean> {
+  if (!clerkConfigured()) return false;
+  try {
+    const { userId } = await auth();
+    if (!userId) return false;
+    const user = await currentUser();
+    return isAllowlisted(
+      user?.primaryEmailAddress?.emailAddress?.toLowerCase() ?? null,
+    );
+  } catch {
+    return false;
+  }
 }
