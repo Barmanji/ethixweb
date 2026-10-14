@@ -8,16 +8,17 @@ export default function MotionLayer({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reveal = () =>
       document
         .querySelectorAll(".reveal, .reveal-card")
         .forEach((element) => element.classList.add("is-visible"));
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      reveal();
       return;
     }
     if (!("IntersectionObserver" in window)) {
-      document
-        .querySelectorAll(".reveal, .reveal-card")
-        .forEach((element) => element.classList.add("is-visible"));
+      reveal();
       return;
     }
     const observer = new IntersectionObserver(
@@ -38,20 +39,18 @@ export default function MotionLayer({
         )
         .forEach((element) => observer.observe(element));
     observe(document);
-    const mutations = new MutationObserver((records) =>
-      records.forEach((record) =>
-        record.addedNodes.forEach((node) => {
-          if (!(node instanceof HTMLElement)) return;
-          if (
-            node.matches(
-              ".reveal:not(.is-visible), .reveal-card:not(.is-visible)",
-            )
-          )
-            observer.observe(node);
-          observe(node);
-        }),
-      ),
-    );
+
+    // Batch mutations into a single scan per frame instead of querying the
+    // subtree on every DOM change (and once per added node).
+    let scheduled = false;
+    const mutations = new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        observe(document);
+      });
+    });
     mutations.observe(document.body, { childList: true, subtree: true });
     return () => {
       mutations.disconnect();

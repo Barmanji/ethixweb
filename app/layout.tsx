@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import SiteNav from "@/components/site-nav";
 import SiteFooter from "@/components/site-footer";
 import MotionLayer from "@/components/motion-layer";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Suspense } from "react";
 import "./globals.css";
 import { Geist } from "next/font/google";
@@ -23,15 +22,6 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const content = (
-    <>
-      <Suspense fallback={<div className="site-header" aria-hidden="true" />}>
-        <SiteNav />
-      </Suspense>
-      <MotionLayer>{children}</MotionLayer>
-      <SiteFooter />
-    </>
-  );
   return (
     <html
       lang="en-IN"
@@ -40,11 +30,13 @@ export default function RootLayout({
     >
       <body id="top">
         <Suspense fallback={null}>
-          {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
-            <ClerkProvider>{content}</ClerkProvider>
-          ) : (
-            content
-          )}
+          <Suspense
+            fallback={<div className="site-header" aria-hidden="true" />}
+          >
+            <SiteNav />
+          </Suspense>
+          <MotionLayer>{children}</MotionLayer>
+          <SiteFooter />
         </Suspense>
       </body>
     </html>
