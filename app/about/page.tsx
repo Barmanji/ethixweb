@@ -1,16 +1,231 @@
 import Link from "next/link";
 
-const values = [["01", "Small by choice", "A close-knit senior team means fewer handoffs, thoughtful decisions, and more care in the work."], ["02", "Clear is kind", "We speak plainly about scope, trade-offs, and progress. Good collaboration starts with trust."], ["03", "Craft with purpose", "We care about the details, and about whether those details make life better for the people using them."], ["04", "Built to keep growing", "We make considered choices that give your business room to adapt and keep moving."]];
-const steps = [["01", "A strong Indian foundation", "Our studio is rooted in India, where resourcefulness, craft, and a lively mix of perspectives shape how we approach digital work."], ["02", "A global point of view", "We collaborate across time zones and contexts, building experiences that feel clear and welcoming wherever customers meet your business."], ["03", "People close to the decisions", "We keep the team small and the conversations direct, so the people shaping the work understand the people it is for."]];
+const values = [
+  [
+    "01",
+    "Small by choice",
+    "A close-knit senior team means fewer handoffs, thoughtful decisions, and more care in the work.",
+  ],
+  [
+    "02",
+    "Clear is kind",
+    "We speak plainly about scope, trade-offs, and progress. Good collaboration starts with trust.",
+  ],
+  [
+    "03",
+    "Craft with purpose",
+    "We care about the details, and about whether those details make life better for the people using them.",
+  ],
+  [
+    "04",
+    "Built to keep growing",
+    "We make considered choices that give your business room to adapt and keep moving.",
+  ],
+];
+const steps = [
+  [
+    "01",
+    "A strong Indian foundation",
+    "Our studio is rooted in India, where resourcefulness, craft, and a lively mix of perspectives shape how we approach digital work.",
+  ],
+  [
+    "02",
+    "A global point of view",
+    "We collaborate across time zones and contexts, building experiences that feel clear and welcoming wherever customers meet your business.",
+  ],
+  [
+    "03",
+    "People close to the decisions",
+    "We keep the team small and the conversations direct, so the people shaping the work understand the people it is for.",
+  ],
+];
 
 export default function AboutPage() {
-  return <main>
-    <section className="page-hero about-hero section-shell"><span className="eyebrow">ABOUT ETHIXWEB · INDIA ROOTED, OPEN TO EVERYWHERE</span><h1>Thoughtful work.<br /><span className="brush-underline">A wider world.</span></h1><p className="lead">Ethixweb is an independent digital studio built in India. We bring design, engineering, and business thinking together, then work directly with the people who know your business best: you.</p><div className="about-stamp"><span>OUR STUDIO</span><strong>Made in India<br />for anywhere</strong><span>INDEPENDENT · CONNECTED</span></div><div className="page-hero-aside"><span>OUR STORY · PEOPLE · PRINCIPLES</span><span>INDIA · IST</span></div></section>
-    <section className="story section-shell section-space"><div className="story-heading reveal"><span className="eyebrow">WHERE WE BEGIN</span><h2>India is home.<br />Curiosity has <em>no borders.</em></h2></div><div className="story-copy reveal"><p>Ethixweb starts from India: a place of extraordinary variety, deep ingenuity, and a constant exchange of ideas. That perspective keeps us adaptable and attentive to the different ways people work, communicate, and make decisions.</p><p>We bring that grounding to a digital world with no single centre. We work with businesses across regions and time zones, pairing local care with a broad outlook on design, technology, and customer experience.</p><p>Our team stays deliberately close to the work. You can speak directly with the people making the decisions, see the thinking as it takes shape, and understand the next step along the way.</p></div></section>
-    <section className="india-story section-shell reveal"><div className="india-story-heading"><span className="eyebrow">A POINT OF VIEW, NOT A LIMIT</span><h2>Rooted in India.<br /><em>Ready for your context.</em></h2><p>We bring the same care to a local service business, a growing team, or a company connecting with customers in many places: listen first, understand the context, and make the useful thing clear.</p></div><div className="india-story-map" aria-hidden="true"><div className="map-ring map-ring-one" /><div className="map-ring map-ring-two" /><div className="map-ring map-ring-three" /><span className="map-dot" /><span className="map-origin">INDIA · IST</span><span className="map-label map-label-one">LOCAL CONTEXT</span><span className="map-label map-label-two">GLOBAL REACH</span><svg viewBox="0 0 400 280"><path d="M199 165 C220 104 273 72 336 77" /><path d="M199 165 C142 111 89 105 48 126" /><path d="M199 165 C246 198 291 218 354 206" /><path d="M199 165 C147 212 104 232 53 218" /></svg><span className="map-node node-north">DESIGN</span><span className="map-node node-east">ENGINEERING</span><span className="map-node node-south">GROWTH</span><span className="map-node node-west">PEOPLE</span></div></section>
-    <section className="working-model section-shell section-space"><div className="section-heading reveal"><div><span className="eyebrow">HOW WE SHOW UP</span><h2>Close collaboration.<br /><em>Clear ownership.</em></h2></div><p>The way we work is built to keep the context with the people doing the work and make progress easier to follow.</p></div><div className="model-grid">{steps.map(([number, title, body]) => <article className="model-card reveal-card" key={number}><span>{number}</span><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-    <section className="values section-shell section-space"><div className="section-heading reveal"><div><span className="eyebrow">WHAT GUIDES THE WORK</span><h2>Our way of<br /><em>working together.</em></h2></div><p>Good outcomes grow from good working relationships. These are the principles we bring to every collaboration.</p></div><div className="values-grid">{values.map(([n, title, body]) => <article key={n} className="value-card reveal-card"><span>{n}</span><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-    <section className="mission section-shell reveal"><span className="eyebrow">A SHARED NORTH STAR</span><blockquote>Make digital work feel <em>more human.</em></blockquote><p>That’s the standard we hold ourselves to, from the first sketch to the small improvements after launch.</p><Link href="/contact" className="text-link">Start a conversation <span>↗</span></Link></section>
-    <section className="closing section-shell reveal"><div><span className="eyebrow">GOOD WORK STARTS WITH PEOPLE</span><h2>Let’s make it<br /><span className="brush-underline">thoughtfully.</span></h2><p>Meet the team with your next challenge in mind.</p></div><Link className="button button-primary" href="/contact">Say hello <span aria-hidden="true">↗</span></Link></section>
-  </main>;
+  return (
+    <main>
+      <section className="page-hero about-hero section-shell">
+        <span className="eyebrow">
+          ABOUT ETHIXWEB · INDIA ROOTED, OPEN TO EVERYWHERE
+        </span>
+        <h1>
+          Thoughtful work.
+          <br />
+          <span className="brush-underline">A wider world.</span>
+        </h1>
+        <p className="lead">
+          Ethixweb is an independent digital studio built in India. We bring
+          design, engineering, and business thinking together, then work
+          directly with the people who know your business best: you.
+        </p>
+        <div className="india-made-mark" role="img" aria-label="Made in India">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="48" />
+            <circle cx="60" cy="60" r="7" />
+            {Array.from({ length: 24 }, (_, i) => (
+              <line
+                key={i}
+                x1="60"
+                y1="15"
+                x2="60"
+                y2="53"
+                transform={`rotate(${i * 15} 60 60)`}
+              />
+            ))}
+          </svg>
+          <span className="india-mark-saffron" />
+          <strong>
+            MADE <small>IN</small> INDIA
+          </strong>
+          <span className="india-mark-green" />
+          <small className="india-mark-caption">
+            ROOTED HERE · WORKING EVERYWHERE
+          </small>
+        </div>
+        <div className="page-hero-aside">
+          <span>OUR STORY · PEOPLE · PRINCIPLES</span>
+          <span>INDIA · IST</span>
+        </div>
+      </section>
+      <section className="story section-shell section-space">
+        <div className="story-heading reveal">
+          <span className="eyebrow">WHERE WE BEGIN</span>
+          <h2>
+            India is home.
+            <br />
+            Curiosity has <em>no borders.</em>
+          </h2>
+        </div>
+        <div className="story-copy reveal">
+          <p>
+            Ethixweb starts from India: a place of extraordinary variety, deep
+            ingenuity, and a constant exchange of ideas. That perspective keeps
+            us adaptable and attentive to the different ways people work,
+            communicate, and make decisions.
+          </p>
+          <p>
+            We bring that grounding to a digital world with no single centre. We
+            work with businesses across regions and time zones, pairing local
+            care with a broad outlook on design, technology, and customer
+            experience.
+          </p>
+          <p>
+            Our team stays deliberately close to the work. You can speak
+            directly with the people making the decisions, see the thinking as
+            it takes shape, and understand the next step along the way.
+          </p>
+        </div>
+      </section>
+      <section className="india-story section-shell reveal">
+        <div className="india-story-heading">
+          <span className="eyebrow">A POINT OF VIEW, NOT A LIMIT</span>
+          <h2>
+            Rooted in India.
+            <br />
+            <em>Ready for your context.</em>
+          </h2>
+          <p>
+            We bring the same care to a local service business, a growing team,
+            or a company connecting with customers in many places: listen first,
+            understand the context, and make the useful thing clear.
+          </p>
+        </div>
+        <div className="india-story-map" aria-hidden="true">
+          <div className="map-ring map-ring-one" />
+          <div className="map-ring map-ring-two" />
+          <div className="map-ring map-ring-three" />
+          <span className="map-dot" />
+          <span className="map-origin">INDIA · IST</span>
+          <span className="map-label map-label-one">LOCAL CONTEXT</span>
+          <span className="map-label map-label-two">GLOBAL REACH</span>
+          <svg viewBox="0 0 400 280">
+            <path d="M199 165 C220 104 273 72 336 77" />
+            <path d="M199 165 C142 111 89 105 48 126" />
+            <path d="M199 165 C246 198 291 218 354 206" />
+            <path d="M199 165 C147 212 104 232 53 218" />
+          </svg>
+          <span className="map-node node-north">DESIGN</span>
+          <span className="map-node node-east">ENGINEERING</span>
+          <span className="map-node node-south">GROWTH</span>
+          <span className="map-node node-west">PEOPLE</span>
+        </div>
+      </section>
+      <section className="working-model section-shell section-space">
+        <div className="section-heading reveal">
+          <div>
+            <span className="eyebrow">HOW WE SHOW UP</span>
+            <h2>
+              Close collaboration.
+              <br />
+              <em>Clear ownership.</em>
+            </h2>
+          </div>
+          <p>
+            The way we work is built to keep the context with the people doing
+            the work and make progress easier to follow.
+          </p>
+        </div>
+        <div className="model-grid">
+          {steps.map(([number, title, body]) => (
+            <article className="model-card reveal-card" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="values section-shell section-space">
+        <div className="section-heading reveal">
+          <div>
+            <span className="eyebrow">WHAT GUIDES THE WORK</span>
+            <h2>
+              Our way of
+              <br />
+              <em>working together.</em>
+            </h2>
+          </div>
+          <p>
+            Good outcomes grow from good working relationships. These are the
+            principles we bring to every collaboration.
+          </p>
+        </div>
+        <div className="values-grid">
+          {values.map(([n, title, body]) => (
+            <article key={n} className="value-card reveal-card">
+              <span>{n}</span>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="mission section-shell reveal">
+        <span className="eyebrow">A SHARED NORTH STAR</span>
+        <blockquote>
+          Make digital work feel <em>more human.</em>
+        </blockquote>
+        <p>
+          That’s the standard we hold ourselves to, from the first sketch to the
+          small improvements after launch.
+        </p>
+        <Link href="/contact" className="text-link">
+          Start a conversation <span>↗</span>
+        </Link>
+      </section>
+      <section className="closing section-shell reveal">
+        <div>
+          <span className="eyebrow">GOOD WORK STARTS WITH PEOPLE</span>
+          <h2>
+            Let’s make it
+            <br />
+            <span className="brush-underline">thoughtfully.</span>
+          </h2>
+          <p>Meet the team with your next challenge in mind.</p>
+        </div>
+        <Link className="button button-primary" href="/contact">
+          Say hello <span aria-hidden="true">↗</span>
+        </Link>
+      </section>
+    </main>
+  );
 }
