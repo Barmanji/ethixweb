@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   description:
     "Ethixweb is an independent digital studio in India bringing thoughtful design, dependable engineering, and practical AI together.",
-  metadataBase: new URL("https://ethixweb.com"),
+  metadataBase: new URL("https://ethixweb-jj.com"),
 };
 
 export default function RootLayout({
@@ -39,11 +39,13 @@ export default function RootLayout({
       className={cn("font-sans", geist.variable)}
     >
       <body id="top">
-        {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
-          <ClerkProvider>{content}</ClerkProvider>
-        ) : (
-          content
-        )}
+        <Suspense fallback={null}>
+          {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? (
+            <ClerkProvider>{content}</ClerkProvider>
+          ) : (
+            content
+          )}
+        </Suspense>
       </body>
     </html>
   );
