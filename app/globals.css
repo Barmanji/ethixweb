@@ -6137,6 +6137,15 @@ html[data-theme="light"] .admin-lead {
 html[data-theme="light"] .admin-lead-details strong {
   color: #382b28;
 }
+html[data-theme="light"] .admin-lead-actions select {
+  border-color: rgba(29, 62, 56, 0.22);
+  background: #ffffff;
+  color: #2c2320;
+}
+html[data-theme="light"] .admin-lead-actions select option {
+  background: #ffffff;
+  color: #2c2320;
+}
 @media (max-width: 640px) {
   .admin-page {
     padding-block: 45px 75px;
