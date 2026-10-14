@@ -1,7 +1,9 @@
 import { SignOutButton } from "@clerk/nextjs";
 import { connection } from "next/server";
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { requireAdmin } from "@/lib/admin";
+import { getAdminAccess } from "@/lib/admin";
+import AdminAccessDenied from "@/components/admin-access-denied";
 import { deleteLead, retryFormspree, updateLeadStatus } from "./actions";
 
 export const instant = false;
@@ -14,7 +16,11 @@ const dateFormat = new Intl.DateTimeFormat("en-IN", {
 
 export default async function AdminPage() {
   await connection();
-  const { email } = await requireAdmin();
+  const access = await getAdminAccess();
+  if (access.status === "unconfigured") notFound();
+  if (access.status === "unauthorized")
+    return <AdminAccessDenied email={access.email} />;
+  const { email } = access;
   const [leads, total, fresh] = await Promise.all([
     prisma.lead.findMany({ orderBy: { createdAt: "desc" }, take: 200 }),
     prisma.lead.count(),

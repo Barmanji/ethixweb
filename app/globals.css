@@ -6062,6 +6062,16 @@ html[data-theme="light"] body {
 .admin-empty p {
   color: var(--muted);
 }
+.admin-empty a {
+  color: var(--teal);
+}
+.admin-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+}
 .auth-page {
   min-height: 75vh;
   padding-block: 90px;

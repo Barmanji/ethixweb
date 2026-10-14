@@ -60,7 +60,7 @@ The form can report success while also indicating that notification delivery is 
 
 ### Admin authorization and actions
 
-Clerk handles sign-in, but a signed-in user is not automatically an administrator. `requireAdmin()` requires Clerk configuration, an authenticated Clerk user, and a primary email present in `ADMIN_EMAILS`; the comparison is case-insensitive and trims whitespace around comma-separated entries. The page and each server action check this gate on the server. Admin actions update status (`NEW`, `CONTACTED`, `QUALIFIED`, `CLOSED`), delete a lead, or retry its Formspree notification.
+Clerk handles sign-in, but a signed-in user is not automatically an administrator. `requireAdmin()` requires Clerk configuration, an authenticated Clerk user, and a primary email present in `ADMIN_EMAILS`; the comparison is case-insensitive and trims whitespace around comma-separated entries. Every server action checks this gate on the server. The page itself uses `getAdminAccess()`: a signed-in visitor who is not allowlisted sees an access-denied screen with a sign-out option instead of a blank 404, and no lead data is queried for them. Admin actions update status (`NEW`, `CONTACTED`, `QUALIFIED`, `CLOSED`), delete a lead, or retry its Formspree notification.
 
 ```mermaid
 sequenceDiagram
