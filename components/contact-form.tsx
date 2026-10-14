@@ -11,7 +11,7 @@ declare global {
           sitekey: string;
           callback: (token: string) => void;
           "expired-callback": () => void;
-          "error-callback": () => void;
+          "error-callback": (errorCode?: string) => void;
           theme: "light" | "dark";
         },
       ) => string;
@@ -21,6 +21,24 @@ declare global {
   }
 }
 
+type TurnstileStatus =
+  | "disabled"
+  | "loading"
+  | "ready"
+  | "verified"
+  | "error";
+
+const turnstileMessages: Record<Exclude<TurnstileStatus, "error">, string> = {
+  disabled: "",
+  loading: "Loading security check…",
+  ready: "Complete the security check to continue.",
+  verified: "Security check verified.",
+};
+
+// If the Turnstile script never loads (blocked, offline, CSP), the widget
+// stays silent, so surface it as an error after a short wait.
+const turnstileLoadTimeoutMs = 12000;
+
 const services = [
   "Web design & development",
   "AI & automation",
@@ -29,6 +47,7 @@ const services = [
   "Ongoing support",
 ];
 export default function ContactForm() {
+  const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
   const [selectedServices, setSelectedServices] = useState<string[]>([
     services[0],
   ]);
@@ -45,11 +64,13 @@ export default function ContactForm() {
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [turnstileToken, setTurnstileToken] = useState("");
-  const [widgetError, setWidgetError] = useState(false);
+  const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>(
+    sitekey ? "loading" : "disabled",
+  );
+  const [turnstileError, setTurnstileError] = useState("");
   const widgetRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef("");
   const startedAt = useRef(0);
-  const sitekey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   useEffect(() => {
     startedAt.current = Date.now();
@@ -58,46 +79,103 @@ export default function ContactForm() {
   useEffect(() => {
     if (!sitekey || !widgetRef.current) return;
     let cancelled = false;
+    let settled = false;
+
+    const failWidget = (message: string) => {
+      if (cancelled || settled) return;
+      settled = true;
+      // Keep verification failing closed: no token, so submission stays blocked.
+      setTurnstileToken("");
+      setTurnstileError(message);
+      setTurnstileStatus("error");
+    };
+
+    // A widget is only present once Cloudflare injects its frame or response
+    // field; an empty container means the challenge never actually rendered.
+    const widgetRendered = () => {
+      const container = widgetRef.current;
+      if (!container) return false;
+      const response = container.querySelector<HTMLInputElement>(
+        'input[name="cf-turnstile-response"]',
+      );
+      if (response?.value) return true;
+      return Boolean(response || container.querySelector("iframe"));
+    };
+
     const render = () => {
-      if (
-        !cancelled &&
-        window.turnstile &&
-        widgetRef.current &&
-        !widgetIdRef.current
-      ) {
+      if (cancelled || !window.turnstile || !widgetRef.current) return;
+      if (widgetIdRef.current) return;
+      try {
         widgetIdRef.current = window.turnstile.render(widgetRef.current, {
           sitekey,
           theme:
             document.documentElement.dataset.theme === "light"
               ? "light"
               : "dark",
-          callback: setTurnstileToken,
-          "expired-callback": () => setTurnstileToken(""),
-          "error-callback": () => {
+          callback: (token: string) => {
+            settled = true;
+            setTurnstileToken(token);
+            setTurnstileError("");
+            setTurnstileStatus("verified");
+          },
+          "expired-callback": () => {
             setTurnstileToken("");
-            setWidgetError(true);
+            setTurnstileStatus("ready");
+          },
+          "error-callback": () => {
+            failWidget(
+              "The security check could not verify this browser. Refresh the page or email contact@ethixweb.com.",
+            );
           },
         });
+        setTurnstileStatus((current) =>
+          current === "error" ? current : "ready",
+        );
+      } catch {
+        failWidget(
+          "The security check could not start. Refresh the page or email contact@ethixweb.com.",
+        );
       }
     };
-    const existing = document.querySelector<HTMLScriptElement>(
-      'script[src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"]',
-    );
-    if (existing) {
-      existing.addEventListener("load", render, { once: true });
+
+    const handleError = () =>
+      failWidget(
+        "The security check could not load. Check your connection or browser extensions, then refresh.",
+      );
+
+    // Watchdog: a widget that never renders (blocked script, offline, bad key)
+    // stays silent, so surface it instead of leaving a disabled button.
+    const guard = setTimeout(() => {
+      if (!widgetRendered())
+        failWidget(
+          "The security check is unavailable right now. Refresh the page or email contact@ethixweb.com.",
+        );
+    }, turnstileLoadTimeoutMs);
+
+    const src =
+      "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    let target = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+    if (window.turnstile) {
       render();
     } else {
-      const script = document.createElement("script");
-      script.src =
-        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-      script.async = true;
-      script.defer = true;
-      script.onload = render;
-      script.onerror = () => setWidgetError(true);
-      document.head.appendChild(script);
+      if (!target) {
+        target = document.createElement("script");
+        target.src = src;
+        target.async = true;
+        target.defer = true;
+        document.head.appendChild(target);
+      }
+      // Both events must be observed on the element we hold; a script that
+      // failed before this effect ran would otherwise hang silently.
+      target.addEventListener("load", render);
+      target.addEventListener("error", handleError);
     }
+
     return () => {
       cancelled = true;
+      clearTimeout(guard);
+      target?.removeEventListener("load", render);
+      target?.removeEventListener("error", handleError);
       if (widgetIdRef.current) window.turnstile?.remove(widgetIdRef.current);
       widgetIdRef.current = "";
     };
@@ -179,7 +257,10 @@ export default function ContactForm() {
     )
       return;
     if (sitekey && !turnstileToken) {
-      setWidgetError(true);
+      setTurnstileError(
+        "Complete the security check before sending your enquiry.",
+      );
+      setTurnstileStatus("error");
       return;
     }
     setStatus("sending");
@@ -203,13 +284,17 @@ export default function ContactForm() {
       setValues({ name: "", email: "", company: "", website: "", message: "" });
       setTouched({});
       setTurnstileToken("");
-      setWidgetError(false);
+      setTurnstileError("");
+      setTurnstileStatus("ready");
       startedAt.current = Date.now();
       if (widgetIdRef.current) window.turnstile?.reset(widgetIdRef.current);
     } catch {
       setStatus("error");
       if (widgetIdRef.current) window.turnstile?.reset(widgetIdRef.current);
       setTurnstileToken("");
+      setTurnstileStatus((current) =>
+        current === "error" ? current : "ready",
+      );
     }
   }
 
@@ -319,9 +404,20 @@ export default function ContactForm() {
       {sitekey && (
         <div className="turnstile-wrap">
           <div ref={widgetRef} />
-          {widgetError && !turnstileToken && (
-            <span className="field-hint" role="status">
-              Complete the security check to continue.
+          {turnstileStatus === "error" ? (
+            <span className="field-error turnstile-status" role="alert">
+              {turnstileError}
+            </span>
+          ) : (
+            <span
+              className={
+                turnstileStatus === "verified"
+                  ? "field-hint turnstile-status verified"
+                  : "field-hint turnstile-status"
+              }
+              role="status"
+            >
+              {turnstileMessages[turnstileStatus]}
             </span>
           )}
         </div>
