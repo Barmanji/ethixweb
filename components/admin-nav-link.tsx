@@ -3,7 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+
+// Clerk writes the __client_uat cookie as a timestamp while a session is active,
+// and "0" once signed out. Reading it lets the public marketing pages show the
+// admin shortcut without loading Clerk's client bundle on every page.
+function hasActiveSession() {
+  return document.cookie.split("; ").some((entry) => {
+    const [name, value] = entry.split("=");
+    return name.startsWith("__client_uat") && value !== "" && value !== "0";
+  });
+}
 
 // Shortcut to /admin, shown only to the allowlisted admin. The allowlist lives
 // in ADMIN_EMAILS on the server, so the nav asks a small endpoint whether the
@@ -15,29 +24,28 @@ export default function AdminNavLink({
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
-  const { isLoaded, isSignedIn, user } = useUser();
-  // The resolved admin's user id, so a different account never inherits the
-  // previous session's result while its own check is in flight.
-  const [adminUserId, setAdminUserId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user) return;
-    const currentId = user.id;
+    // Skip the request entirely for signed-out visitors.
+    if (!hasActiveSession()) {
+      setIsAdmin(false);
+      return;
+    }
     let active = true;
     fetch("/api/admin/status", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : { admin: false }))
       .then((data: { admin?: boolean }) => {
-        if (active) setAdminUserId(data?.admin ? currentId : null);
+        if (active) setIsAdmin(Boolean(data?.admin));
       })
       .catch(() => {
-        if (active) setAdminUserId(null);
+        if (active) setIsAdmin(false);
       });
     return () => {
       active = false;
     };
-  }, [isLoaded, isSignedIn, user]);
+  }, [pathname]);
 
-  const isAdmin = Boolean(user && adminUserId === user.id);
   if (!isAdmin) return null;
 
   return (

@@ -7220,3 +7220,26 @@ html[data-theme="light"] .theme-toggle-icon {
     width: 138px !important;
   }
 }
+
+/* Creepy button eyes: composited blink (scaleY) replaces the JS animation so
+   the hero renders without pulling in framer-motion. */
+.creepy-eye {
+  height: 0.75em;
+  transform-origin: center;
+  animation: creepy-blink 3s linear infinite;
+}
+@keyframes creepy-blink {
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.06);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .creepy-eye {
+    animation: none;
+  }
+}
